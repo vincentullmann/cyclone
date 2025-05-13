@@ -1,7 +1,7 @@
 import hou  # type: ignore[reportMissingModuleSource]
 
 
-class CameraNode(hou.ObjNode):
+class Cam(hou.ObjNode):
 
     def __init__(self, node=None):
         print("MyCameraNode.__my_init__")
