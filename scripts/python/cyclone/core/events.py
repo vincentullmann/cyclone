@@ -1,7 +1,7 @@
 """Simple Event / Observer System."""
 
 # IMPORT STANDARD LIBRARIES
-from typing import Dict, List, Any, Protocol
+from typing import Dict, List, Any, Protocol, Callable
 
 
 class Event:
@@ -43,6 +43,15 @@ def register(event_name: str, callback: EventCallback) -> None:
     _listeners.setdefault(event_name, []).append(callback)
 
 
+def on(event_name: str) -> Callable[..., EventCallback]:
+
+    def decorator(func: EventCallback) -> EventCallback:
+        register(event_name, func)
+        return func
+
+    return decorator
+
+
 def emit(event_name: str, **kwargs: Any) -> None:
     """Emit an event with the given name. All registered callbacks for that name will be called.
 
@@ -51,9 +60,9 @@ def emit(event_name: str, **kwargs: Any) -> None:
         **kwargs: Additional data to attach to the event.
 
     """
-    event = Event(event_name)
+    kwargs["event"] = Event(event_name)
     for callback in _listeners.get(event_name, []):
-        callback(event, **kwargs)
+        callback(**kwargs)
 
 
 def clear(event_name: str | None = None) -> None:

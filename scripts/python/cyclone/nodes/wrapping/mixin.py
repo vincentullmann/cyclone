@@ -12,7 +12,12 @@ cache_key = tuple[str, int]
 
 
 _WRAPPED_NODE_CACHE: dict[cache_key, hou.Node | None] = {}
-"""Map to store wrapped Nodes"""
+"""Map to store wrapped Nodes.
+
+tbd: using a `WeakValueDictionary` might be a good Idea here but might also lead
+to counter-intuitive behavior if NodeClasses store/init values in their `__init__`
+methods. (said that..  they probl. shouldn't do that.)
+"""
 
 
 def get_key(node: hou.Node) -> cache_key:
@@ -26,9 +31,6 @@ def clear_node_cache(event: events.Event, node: hou.Node, **kwargs) -> None:
     """Remove a node from the wrap cache"""
     key = get_key(node)
     _WRAPPED_NODE_CACHE.pop(key, None)
-
-
-events.register("OnDeleted", clear_node_cache)  # type: ignore[arg-type]  # mypy is not happy with the "node" argument
 
 
 def wrap_node(node: hou.Node) -> hou.Node | None:
@@ -100,3 +102,30 @@ class WrapMixin(hou.Node):
 
         cls = type(wrapped)
         return f"<{cls.__module__}.{cls.__name__}(type={self.type().name()} path={self.path()})>"
+
+
+################################################################################
+# Forward various events
+
+
+@events.on("OnCreated")
+@events.on("OnLoaded")
+@events.on("OnNameChanged")
+@events.on("OnInputChanged")
+def on_cleared(event: events.Event, node: hou.Node, **kwargs):
+    wrapped = wrap_node(node)
+
+    # run `wrapped.OnCreated()` for any event type
+    func = getattr(wrapped, event.name, None)
+    if callable(func):
+        func(**kwargs)
+
+
+@events.on("OnDeleted")
+def on_deleted(node: hou.Node, **kwargs):
+
+    key = get_key(node)
+    wrapped = _WRAPPED_NODE_CACHE.pop(key, None)
+
+    if wrapped and hasattr(wrapped, "OnDeleted"):
+        wrapped.OnDeleted()
