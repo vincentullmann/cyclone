@@ -76,8 +76,6 @@ class DynamicImportProvider(NodeClassProvider):
         import_template = self.format_template(node_type)
         mod_path, class_name = import_template.rsplit(".", 1)
 
-        print("[DynamicImportProvider] import_template", import_template)
-
         try:
             mod = importlib.import_module(mod_path)
             return getattr(mod, class_name, None)

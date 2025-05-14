@@ -4,6 +4,7 @@
 import hou  # type: ignore[reportMissingModuleSource]
 
 # IMPORT LOCAL LIBRARIES
+from cyclone.core import events
 from cyclone.nodes.wrapping.provider import WrapClassProvider
 
 
@@ -19,6 +20,15 @@ def get_key(node: hou.Node) -> cache_key:
     the node type with in the internal _objectmap of SuperNode
     """
     return (node.type().nameWithCategory(), node.sessionId())
+
+
+def clear_node_cache(event: events.Event, node: hou.Node, **kwargs) -> None:
+    """Remove a node from the wrap cache"""
+    key = get_key(node)
+    _WRAPPED_NODE_CACHE.pop(key, None)
+
+
+events.register("OnDeleted", clear_node_cache)  # type: ignore[arg-type]  # mypy is not happy with the "node" argument
 
 
 def wrap_node(node: hou.Node) -> hou.Node | None:
