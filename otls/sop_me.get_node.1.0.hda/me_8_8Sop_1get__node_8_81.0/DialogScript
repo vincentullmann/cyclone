@@ -1,0 +1,74 @@
+# Dialog script for me::get_node::1.0 automatically generated
+
+{
+    name	me::get_node::1.0
+    script	me::get_node::1.0
+    label	get_node
+
+    help {
+	""
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+    parm {
+        name    "source"
+        label   "Source"
+        type    string
+        joinnext
+        default { "" }
+        menureplace {
+            [ "hou.pwd().source_menu()" ]
+            language python
+        }
+        parmtag { "oprelative" "." }
+        parmtag { "script_callback" "hou.pwd().source_changed(**kwargs)" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "button_jump"
+        label   "button_jump"
+        type    button
+        nolabel
+        joinnext
+        default { "0" }
+        parmtag { "button_icon" "hicon:/SVGIcons.index?BUTTONS_jump.svg" }
+        parmtag { "script_callback" "hou.pwd().button_jump_clicked()" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "button_pick"
+        label   "button_pick"
+        type    button
+        nolabel
+        default { "0" }
+        parmtag { "button_icon" "hicon:/SVGIcons.index?BUTTONS_chooser_node.svg" }
+        parmtag { "script_callback" "hou.pwd().button_pick_clicked()" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "sepparm"
+        label   "Separator"
+        type    separator
+        default { "" }
+    }
+    parm {
+        name    "newparameter"
+        label   "Label"
+        type    button
+        default { "0" }
+        parmtag { "script_callback" "hou.phm().pick(**kwargs)" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "newparameter2"
+        label   "Test"
+        type    button
+        default { "0" }
+        parmtag { "script_callback" "hou.pwd().reload();print(hou.pwd().x)" }
+        parmtag { "script_callback_language" "python" }
+    }
+}

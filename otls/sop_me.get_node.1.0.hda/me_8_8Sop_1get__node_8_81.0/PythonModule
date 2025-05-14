@@ -1,0 +1,40 @@
+import hou
+
+
+def node_filter(node: hou.Node):
+    """
+    Custom node filter to only show nodes of a specific type.
+    :param node: The node to check.
+    :return: True if the node is of the desired type, False otherwise.
+    """
+    node_type = node.type().name()
+
+    allowed_types = {"output"}
+    print("yue", node.name().isupper())
+
+    # return (node_type in allowed_types) or node.name().isupper()
+
+    if node_type in allowed_types:
+        return True
+
+    name = node.name()
+
+    if name.isupper():
+        return True
+
+    return False
+
+
+def pick(node, **kwargs):
+    print("hey", node, node.test())
+
+    path = hou.ui.selectNode(
+        relative_to_node=node,
+        initial_node=node,
+        title="Select a node",
+        # node_type_filter=hou.nodeTypeFilter.Parms,
+        multiple_select=False,
+        custom_node_filter_callback=node_filter,
+    )
+
+    print(path)
