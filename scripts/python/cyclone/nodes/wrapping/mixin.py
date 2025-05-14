@@ -51,13 +51,15 @@ def wrap_node(node: hou.Node) -> hou.Node | None:
 
 
 class WrapMixin(hou.Node):
-    """
-    Mixin to proxy attribute access to a custom-wrapped class if defined.
-    This supports live wrapping via sessionId-based caching.
-    """
+    """Mixin to proxy attribute access to a custom-wrapped class if defined."""
 
     def _wrapped_node(self) -> hou.Node | None:
         return wrap_node(self)
+
+    def reload(self):
+        WrapClassProvider.reload(self.type())
+        clear_node_cache(None, self)
+        self._wrapped_node()
 
     def __getattr__(self, name: str):
         wrapped = self._wrapped_node()

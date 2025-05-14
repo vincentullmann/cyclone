@@ -3,6 +3,7 @@
 # IMPORT STANDARD LIBRARIES
 import functools
 import importlib
+import inspect
 import string
 
 # IMPORT THIRD PARTY LIBRARIES
@@ -28,6 +29,16 @@ class NodeClassProvider:
 
     def get(self, node_type: hou.NodeType) -> type[hou.Node] | None:
         raise NotImplementedError
+
+    def reload(self, node_type: hou.NodeType) -> None:
+        """reload the custom class registered for the given node type."""
+        cls = self.get(node_type)
+        if not cls:
+            return
+
+        module = inspect.getmodule(cls)
+        if module:
+            importlib.reload(module)
 
 
 class RegistryProvider(NodeClassProvider):
@@ -97,6 +108,18 @@ class CompositeProvider(NodeClassProvider):
                 return cls
         else:
             return None
+
+    def reload(self, node_type: hou.NodeType) -> None:
+
+        # functools does not offer an easy method to clear specific keys
+        # from the cache. Apparently there is some undocumented ".cache" dict
+        # but lets stay with the official methods for now.
+        # This is likely only used during development/debugging and not relevant
+        # for production
+        self.get.cache_clear()
+
+        for provider in self.providers:
+            provider.reload(node_type)
 
 
 WrapClassProvider = CompositeProvider(
