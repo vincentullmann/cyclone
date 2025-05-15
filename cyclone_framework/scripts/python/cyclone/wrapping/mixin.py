@@ -4,7 +4,7 @@
 import hou  # type: ignore[reportMissingModuleSource]
 
 # IMPORT LOCAL LIBRARIES
-from cyclone.core import events
+from cyclone import events
 from cyclone.nodes.wrapping.provider import WrapClassProvider
 
 

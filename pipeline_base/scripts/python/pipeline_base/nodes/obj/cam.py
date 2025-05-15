@@ -13,3 +13,6 @@ class Cam(hou.ObjNode):
 
     def test123(self):
         return "MyCameraNode.test123"
+
+    def OnDeleted(self):
+        print("deleting camera node")
