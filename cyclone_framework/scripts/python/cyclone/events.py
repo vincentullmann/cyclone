@@ -3,6 +3,9 @@
 # IMPORT STANDARD LIBRARIES
 from typing import Dict, List, Any, Protocol, Callable
 
+# IMPORT LOCAL LIBRARIES
+from cyclone.logger import logger
+
 
 class Event:
     """Represents an event emitted by the system.
@@ -60,6 +63,7 @@ def emit(event_name: str, **kwargs: Any) -> None:
         **kwargs: Additional data to attach to the event.
 
     """
+    logger.debug(f"{event_name} | kwargs: {kwargs}")
     kwargs["event"] = Event(event_name)
     for callback in _listeners.get(event_name, []):
         callback(**kwargs)

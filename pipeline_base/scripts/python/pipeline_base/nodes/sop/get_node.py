@@ -1,8 +1,5 @@
 # IMPORT THIRD PARTY LIBRARIES
 import hou
-import nodegraphview
-
-# import toolutils
 
 # IMPORT LOCAL LIBRARIES
 from cyclone.logger import logger
@@ -52,9 +49,9 @@ class GetNode:
             hou.ui.paneTabUnderCursor(),
             *hou.ui.currentPaneTabs(),
         ]:
-            if pane and pane.type() == hou.paneTabType.NetworkEditor:
+            if pane and isinstance(pane, hou.NetworkEditor):  #  pane.type() == hou.paneTabType.NetworkEditor:
                 pane.setCurrentNode(self._source_node)
-                pane.homeToSelection()
+                pane.homeToSelection()  # type: ignore[attr-defined]  # not sure where this comes from.
                 return
 
     def source_menu(self):

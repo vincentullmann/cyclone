@@ -4,24 +4,12 @@
 import functools
 import importlib
 import inspect
-import string
 
 # IMPORT THIRD PARTY LIBRARIES
 import hou
 
-
-class CustomFormatter(string.Formatter):
-
-    def format_field(self, value: str, format_spec: str) -> str:
-
-        if format_spec.lower() == "upper":
-            return value.upper()
-        if format_spec.lower() == "capitalize":
-            return value.capitalize()
-        if format_spec.lower() == "camelcase":
-            return "".join(word.capitalize() for word in str(value).split("_"))
-
-        return super().format_field(value, format_spec)  # type: ignore  # format_field has no type hint
+# IMPORT LOCAL LIBRARIES
+from cyclone.utils.text import CustomFormatter
 
 
 class NodeClassProvider:
@@ -98,7 +86,7 @@ class CompositeProvider(NodeClassProvider):
     """Provider combining multiple child providers"""
 
     def __init__(self, *providers: NodeClassProvider):
-        self.providers = providers
+        self.providers = list(providers)
 
     @functools.lru_cache(maxsize=None)
     def get(self, node_type: hou.NodeType) -> type[hou.Node] | None:
@@ -121,14 +109,24 @@ class CompositeProvider(NodeClassProvider):
         for provider in self.providers:
             provider.reload(node_type)
 
+    def add_import_path(self, path: str) -> None:
+        """Add a new import path to the provider.
+
+        args:
+            path: the template path to add.
+
+        """
+        provider = DynamicImportProvider(path)
+        self.providers.append(provider)
+
 
 WrapClassProvider = CompositeProvider(
     RegistryProvider(),
     # FIXME: not ideal... either pick a fixed format or generate variations in a more
     # dynamic way
-    DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}__{version}.{name}"),
-    DynamicImportProvider("cyclone.nodes.{category}.{name}__{version}.{name:Capitalize}"),
-    DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}.{name:CamelCase}"),
-    DynamicImportProvider("cyclone.nodes.{category}.{name}.{name}"),
-    DynamicImportProvider("cyclone.nodes.{category}.{name}.{name:CamelCase}"),
+    # DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}__{version}.{name}"),
+    # DynamicImportProvider("cyclone.nodes.{category}.{name}__{version}.{name:Capitalize}"),
+    # DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}.{name:CamelCase}"),
+    # DynamicImportProvider("cyclone.nodes.{category}.{name}.{name}"),
+    # DynamicImportProvider("cyclone.nodes.{category}.{name}.{name:CamelCase}"),
 )
