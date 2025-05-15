@@ -6,5 +6,7 @@
 
         // stop complainign about missing "hou
         "reportMissingModuleSource": "none",
-    }
+    },
+
+    "mypy-type-checker.reportingScope": "workspace",
 }
