@@ -1,6 +1,7 @@
 # IMPORT STANDARD LIBRARIES
 
 # IMPORT THIRD PARTY LIBRARIES
+from typing import Any, Iterable
 import hou
 
 # IMPORT LOCAL LIBRARIES
@@ -27,7 +28,7 @@ def get_key(node: hou.Node) -> cache_key:
     return (node.type().nameWithCategory(), node.sessionId())
 
 
-def clear_node_cache(event: events.Event, node: hou.Node, **kwargs) -> None:
+def clear_node_cache(node: hou.Node) -> None:
     """Remove a node from the wrap cache"""
     key = get_key(node)
     _WRAPPED_NODE_CACHE.pop(key, None)
@@ -58,12 +59,12 @@ class WrapMixin(hou.Node):
     def _wrapped_node(self) -> hou.Node | None:
         return wrap_node(self)
 
-    def reload(self):
+    def reload(self) -> None:
         WrapClassProvider.reload(self.type())
-        clear_node_cache(None, self)
+        clear_node_cache(self)
         self._wrapped_node()
 
-    def __getattr__(self, name: str):
+    def __getattr__(self, name: str) -> Any:
         wrapped = self._wrapped_node()
 
         if name in wrapped.__dir__():
@@ -71,7 +72,7 @@ class WrapMixin(hou.Node):
         else:
             raise AttributeError("NodeType %r has no attribute %r" % (self.type().nameWithCategory(), name))
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> Any:
         if name == "this":  # Needed by Houdini's SWIG init
             return super().__setattr__(name, value)
 
@@ -80,7 +81,7 @@ class WrapMixin(hou.Node):
             return setattr(wrapped_node, name, value)
         return super().__setattr__(name, value)
 
-    def __dir__(self):
+    def __dir__(self) -> Iterable[str]:
         wrapped = self._wrapped_node()
         if not wrapped:
             return super().__dir__()
@@ -89,13 +90,13 @@ class WrapMixin(hou.Node):
         return set(super().__dir__()) | set(dir(wrapped))
 
     @property
-    def __doc__(self):
+    def __doc__(self) -> str | None:  # type: ignore[override]  # going to read-only
         wrapped = self._wrapped_node()
         if not wrapped:
             return super().__doc__
         return wrapped.__doc__
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         wrapped = self._wrapped_node()
         if not wrapped:
             return super().__repr__()
@@ -112,7 +113,7 @@ class WrapMixin(hou.Node):
 @events.on("OnLoaded")
 @events.on("OnNameChanged")
 @events.on("OnInputChanged")
-def on_cleared(event: events.Event, node: hou.Node, **kwargs):
+def on_cleared(event: events.Event, node: hou.Node, **kwargs: Any) -> None:
     wrapped = wrap_node(node)
 
     # run `wrapped.OnCreated()` for any event type
@@ -122,7 +123,7 @@ def on_cleared(event: events.Event, node: hou.Node, **kwargs):
 
 
 @events.on("OnDeleted")
-def on_deleted(node: hou.Node, **kwargs):
+def on_deleted(node: hou.Node, **kwargs: Any) -> None:
 
     key = get_key(node)
     wrapped = _WRAPPED_NODE_CACHE.pop(key, None)

@@ -85,8 +85,20 @@ class DynamicImportProvider(NodeClassProvider):
 class CompositeProvider(NodeClassProvider):
     """Provider combining multiple child providers"""
 
-    def __init__(self, *providers: NodeClassProvider):
-        self.providers = list(providers)
+    def __init__(self) -> None:
+
+        registry = RegistryProvider()
+        # forward the key methods
+        self.register = registry.unregister
+        self.unregister = registry.unregister
+
+        self.providers: list[NodeClassProvider] = [
+            registry,
+        ]
+        """list of registered providers, checked in order."""
+
+    ##################
+    # Overrides
 
     @functools.lru_cache(maxsize=None)
     def get(self, node_type: hou.NodeType) -> type[hou.Node] | None:
@@ -94,8 +106,8 @@ class CompositeProvider(NodeClassProvider):
             cls = provider.get(node_type)
             if cls:
                 return cls
-        else:
-            return None
+
+        return None
 
     def reload(self, node_type: hou.NodeType) -> None:
 
@@ -109,6 +121,9 @@ class CompositeProvider(NodeClassProvider):
         for provider in self.providers:
             provider.reload(node_type)
 
+    ##################
+    # new
+
     def add_import_path(self, path: str) -> None:
         """Add a new import path to the provider.
 
@@ -120,13 +135,4 @@ class CompositeProvider(NodeClassProvider):
         self.providers.append(provider)
 
 
-WrapClassProvider = CompositeProvider(
-    RegistryProvider(),
-    # FIXME: not ideal... either pick a fixed format or generate variations in a more
-    # dynamic way
-    # DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}__{version}.{name}"),
-    # DynamicImportProvider("cyclone.nodes.{category}.{name}__{version}.{name:Capitalize}"),
-    # DynamicImportProvider("cyclone.nodes.{category}.{namespace}__{name}.{name:CamelCase}"),
-    # DynamicImportProvider("cyclone.nodes.{category}.{name}.{name}"),
-    # DynamicImportProvider("cyclone.nodes.{category}.{name}.{name:CamelCase}"),
-)
+WrapClassProvider = CompositeProvider()

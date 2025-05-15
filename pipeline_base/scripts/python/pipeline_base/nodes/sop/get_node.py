@@ -1,4 +1,5 @@
 # IMPORT THIRD PARTY LIBRARIES
+from typing import Any
 import hou
 
 # IMPORT LOCAL LIBRARIES
@@ -54,8 +55,8 @@ class GetNode:
                 pane.homeToSelection()  # type: ignore[attr-defined]  # not sure where this comes from.
                 return
 
-    def source_menu(self):
-        nodes = hou.node("/").allSubChildren(recurse_in_locked_nodes=True)
+    def source_menu(self) -> list[str]:
+        nodes = hou.node("/").allSubChildren(recurse_in_locked_nodes=True)  # type: ignore[union-attr]
         nodes = [node for node in nodes if self.node_filter(node)]
         paths = [self.node.relativePathTo(node) for node in nodes]
         paths = [path for path in paths for _ in range(2)]
@@ -77,7 +78,7 @@ class GetNode:
 
     ################################################################################
 
-    def source_changed(self, **kwargs):
+    def source_changed(self, **kwargs: Any) -> None:
         # node: hou.OpNode = None, parm_tuple: hou.ParmTuple = None,
 
         # remove old callbacks
@@ -99,7 +100,7 @@ class GetNode:
             self._source_node.addEventCallback((hou.nodeEventType.AppearanceChanged,), self._source_appearance_changed)
             self._source_node.addEventCallback((hou.nodeEventType.NameChanged,), self._source_name_changed)
 
-    def _source_appearance_changed(self, node: hou.OpNode, change_type: hou.appearanceChangeType, **kwargs):
+    def _source_appearance_changed(self, node: hou.OpNode, change_type: hou.appearanceChangeType, **kwargs: Any) -> None:
 
         print("[_source_appearance_changed]", kwargs)
         if self._source_node is None:
@@ -108,7 +109,7 @@ class GetNode:
         if change_type == hou.appearanceChangeType.Color:
             self.node.setColor(node.color())
 
-    def _source_name_changed(self, node: hou.OpNode, **kwargs):
+    def _source_name_changed(self, node: hou.OpNode, **kwargs: Any) -> None:
         print("[_source_name_changed]", kwargs)
 
         parm = self.node.parm("source")

@@ -2,9 +2,12 @@
 https://www.sidefx.com/docs/houdini/hom/locations.html#node_event_files
 """
 
+# IMPORT STANDARD LIBRARIES
+import typing
+
 # 🌀 IMPORT LOCAL LIBRARIES
 from cyclone import events
 
-kwargs: dict
+kwargs: dict[str, typing.Any]
 
 events.emit("PostLastDelete", **kwargs)

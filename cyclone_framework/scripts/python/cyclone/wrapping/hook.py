@@ -21,12 +21,12 @@ class SopNodeProxy(WrapMixin, hou.SopNode):
 # ]
 
 
-def apply():
+def apply() -> None:
     _hou.ObjNode_swigregister(ObjNodeProxy)
     _hou.SopNode_swigregister(SopNodeProxy)
 
 
-def remove():
+def remove() -> None:
     # untested
     _hou.ObjNode_swigregister(hou.ObjNode)
     _hou.SopNode_swigregister(hou.SopNode)
