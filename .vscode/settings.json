@@ -1,0 +1,10 @@
+{
+    "python.analysis.extraPaths": [
+        "cyclone_framework/scripts/python"
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+
+        // stop complainign about missing "hou
+        "reportMissingModuleSource": "none",
+    }
+}

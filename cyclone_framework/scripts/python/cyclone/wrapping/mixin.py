@@ -1,11 +1,11 @@
 # IMPORT STANDARD LIBRARIES
 
 # IMPORT THIRD PARTY LIBRARIES
-import hou  # type: ignore[reportMissingModuleSource]
+import hou
 
 # IMPORT LOCAL LIBRARIES
 from cyclone import events
-from cyclone.nodes.wrapping.provider import WrapClassProvider
+from cyclone.wrapping.provider import WrapClassProvider
 
 
 cache_key = tuple[str, int]

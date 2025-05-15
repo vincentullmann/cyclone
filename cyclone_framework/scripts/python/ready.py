@@ -1,5 +1,5 @@
 # IMPORT LOCAL LIBRARIES
-from cyclone.nodes.wrapping import hook
+from cyclone.wrapping import hook
 
 
 hook.apply()

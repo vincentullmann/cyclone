@@ -8,7 +8,3 @@ from cyclone import events
 kwargs: dict
 
 events.emit("OnLoaded", **kwargs)
-
-node = kwargs.get("node")
-if node and hasattr(node, "OnLoaded"):
-    node.OnLoaded()

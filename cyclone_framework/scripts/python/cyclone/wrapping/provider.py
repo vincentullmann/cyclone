@@ -7,7 +7,7 @@ import inspect
 import string
 
 # IMPORT THIRD PARTY LIBRARIES
-import hou  # type: ignore[reportMissingModuleSource]
+import hou
 
 
 class CustomFormatter(string.Formatter):
@@ -21,7 +21,7 @@ class CustomFormatter(string.Formatter):
         if format_spec.lower() == "camelcase":
             return "".join(word.capitalize() for word in str(value).split("_"))
 
-        return super().format_field(value, format_spec)
+        return super().format_field(value, format_spec)  # type: ignore  # format_field has no type hint
 
 
 class NodeClassProvider:

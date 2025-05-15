@@ -1,4 +1,4 @@
-import hou  # type: ignore[reportMissingModuleSource]
+import hou
 import _hou  # type: ignore
 
 # IMPORT LOCAL LIBRARIES
