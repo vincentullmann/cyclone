@@ -9,4 +9,7 @@
     },
 
     "mypy-type-checker.reportingScope": "workspace",
+    "cSpell.words": [
+        "swigregister"
+    ],
 }

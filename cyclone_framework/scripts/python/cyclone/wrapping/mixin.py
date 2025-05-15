@@ -111,13 +111,16 @@ class WrapMixin(hou.Node):
 
 @events.on("OnCreated")
 @events.on("OnLoaded")
-@events.on("OnNameChanged")
-@events.on("OnInputChanged")
-def on_cleared(event: events.Event, node: hou.Node, **kwargs: Any) -> None:
-    wrapped = wrap_node(node)
+def on_create(event: events.Event, **kwargs: Any) -> None:
+
+    node: hou.Node | None = kwargs.get("node")
+    if not node:
+        return
+
+    node = wrap_node(node) or node
 
     # run `wrapped.OnCreated()` for any event type
-    func = getattr(wrapped, event.name, None)
+    func = getattr(node, event.name, None)
     if callable(func):
         func(**kwargs)
 

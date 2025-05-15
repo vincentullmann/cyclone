@@ -3,8 +3,8 @@
     "load_package_once": true,
 
     "hpath" : [
-        "./cyclone_framework",
-        "./pipeline_base"
+        "${HOUDINI_PACKAGE_PATH}/cyclone_framework",
+        "${HOUDINI_PACKAGE_PATH}/pipeline_base"
     ],
 
     "env": []

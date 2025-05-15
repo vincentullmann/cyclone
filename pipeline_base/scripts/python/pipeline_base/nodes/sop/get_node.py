@@ -4,26 +4,30 @@ import hou
 
 # IMPORT LOCAL LIBRARIES
 from cyclone.logger import logger
+from cyclone.nodes.base import BaseNode
 
 
-class GetNode:
+class GetNode(BaseNode):
     """
     Get a node from the Houdini scene.
     """
 
+    defaults = {
+        "source": "initial source",
+    }
+
     def __init__(self, node: hou.SopNode) -> None:
         """Initialize the GetNode class."""
+        super().__init__(node)
 
-        logger.info("GetNode init")
-
-        self.node = node
         self.x = 0
-
         self._source_node: hou.OpNode | None = None
         # self.node.addParmCallback(self._source_changed, ("source",))
 
         # init
         self.source_changed()
+
+    ############################################################################
 
     def button_pick_clicked(self) -> None:
 
@@ -36,9 +40,7 @@ class GetNode:
             custom_node_filter_callback=self.node_filter,
         )
         if isinstance(path, str):
-            parm = self.node.parm("source")
-            if parm:
-                parm.set(path)
+            self.set_parm("source", path)
 
     def button_jump_clicked(self) -> None:
 
@@ -90,11 +92,7 @@ class GetNode:
                 # callback was not added
                 pass
 
-        # print("_source_changed 1", node, parm_tuple, kwargs)
-        parm = self.node.parm("source")
-        if not parm:
-            return
-
+        parm = self.parm("source")
         self._source_node = parm.evalAsNode()
         if self._source_node:
             self._source_node.addEventCallback((hou.nodeEventType.AppearanceChanged,), self._source_appearance_changed)
@@ -112,9 +110,7 @@ class GetNode:
     def _source_name_changed(self, node: hou.OpNode, **kwargs: Any) -> None:
         print("[_source_name_changed]", kwargs)
 
-        parm = self.node.parm("source")
-        if not parm:
-            return
+        parm = self.parm("source")
 
         path = parm.evalAsString()
         is_absolute = path.startswith("/")
